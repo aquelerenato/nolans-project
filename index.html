@@ -131,10 +131,10 @@
 });
       const data = await response.json();
 
-      const botReply = data.reply || "Erro ao responder.";;
+      const botReply = data.reply || "Erro ao responder.";
       addMessage(botReply, "bot");
     } catch (error) {
-      addMessage("Estamos corrigindo algumas questões neste fluxo automatizado. Durante este período, por favor, entre em contato com nosso time através do suporte@usenola.com.", "bot");
+      addMessage("Estamos corrigindo a rota para Gargântua neste ambiente. Enquanto isso, por favor, entre em contato com nosso time através do suporte@usenola.com.", "bot");
     }
   }
 </script>
