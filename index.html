@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Nola Chatbot</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f5f7fb;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+
+    .chat-container {
+      width: 360px;
+      height: 600px;
+      background: #fff;
+      border-radius: 16px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .chat-header {
+      background: #fd6263;
+      color: #fff;
+      padding: 16px;
+      font-weight: bold;
+      text-align: center;
+    }
+
+    .chat-messages {
+      flex: 1;
+      padding: 16px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .message {
+      max-width: 80%;
+      padding: 10px 14px;
+      border-radius: 12px;
+      font-size: 14px;
+      line-height: 1.4;
+    }
+
+    .user {
+      align-self: flex-end;
+      background: #1d2939;
+      color: #fff;
+    }
+
+    .bot {
+      align-self: flex-start;
+      background: #eee;
+      color: #333;
+    }
+
+    .chat-input {
+      display: flex;
+      border-top: 1px solid #ddd;
+    }
+
+    .chat-input input {
+      flex: 1;
+      border: none;
+      padding: 12px;
+      font-size: 14px;
+      outline: none;
+    }
+
+    .chat-input button {
+      background: #6c63ff;
+      color: white;
+      border: none;
+      padding: 0 16px;
+      cursor: pointer;
+    }
+
+    .chat-input button:hover {
+      background: #898fff;
+    }
+  </style>
+</head>
+<body>
+
+<div class="chat-container">
+  <div class="chat-header">✨ Precisa de ajuda? ✨</br>🌀 O Nolan te explica 🌀</div>
+
+  <div class="chat-messages" id="messages"></div>
+
+  <div class="chat-input">
+    <input type="text" id="input" placeholder="Digite sua dúvida..." />
+    <button onclick="sendMessage()">Enviar</button>
+  </div>
+</div>
+
+<script>
+  const webhookUrl = "https://aquelerenato.app.n8n.cloud/webhook/nolans-project";
+
+  function addMessage(text, sender) {
+    const msg = document.createElement("div");
+    msg.classList.add("message", sender);
+    msg.innerText = text;
+    document.getElementById("messages").appendChild(msg);
+    msg.scrollIntoView();
+  }
+
+  async function sendMessage() {
+    const input = document.getElementById("input");
+    const text = input.value.trim();
+    if (!text) return;
+
+    addMessage(text, "user");
+    input.value = "";
+
+    try {
+      const response = await fetch(`${webhookUrl}?message=${encodeURIComponent(text)}`);
+      const data = await response.json();
+
+      const botReply = data[0]?.choices?.[0]?.message?.content || "Erro ao responder.";
+      addMessage(botReply, "bot");
+    } catch (error) {
+      addMessage("Estamos corrigindo algumas questões neste fluxo automatizado. Durante este período, por favor, entre em contato com nosso time através do suporte@usenola.com.", "bot");
+    }
+  }
+</script>
+
+</body>
+</html>
