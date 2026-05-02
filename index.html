@@ -125,7 +125,7 @@
       const response = await fetch(`${webhookUrl}?message=${encodeURIComponent(text)}`);
       const data = await response.json();
 
-      const botReply = data[0]?.choices?.[0]?.message?.content || "Erro ao responder.";
+      const botReply = data.reply || "Erro ao responder.";;
       addMessage(botReply, "bot");
     } catch (error) {
       addMessage("Estamos corrigindo algumas questões neste fluxo automatizado. Durante este período, por favor, entre em contato com nosso time através do suporte@usenola.com.", "bot");
