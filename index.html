@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Nola Chatbot</title>
+
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -89,33 +90,37 @@
     }
   </style>
 </head>
+
 <body>
 
 <div class="chat-container">
-  <div class="chat-header">✨ Precisa de ajuda? ✨</br>🌀 O Nolan te explica 🌀</div>
+  <div class="chat-header">
+    ✨ Precisa de ajuda? ✨<br>🌀 O Nolan te explica 🌀
+  </div>
 
   <div class="chat-messages" id="messages"></div>
 
   <div class="chat-input">
     <input type="text" id="input" placeholder="Digite sua dúvida..." />
-    <button id="sendBtn">Enviar</button>
+    <button id="sendBtn" type="button">Enviar</button>
   </div>
 </div>
 
 <script>
-  const webhookUrl = "https://aquelerenato.app.n8n.cloud/webhook/nolans-project";
+const webhookUrl = "https://aquelerenato.app.n8n.cloud/webhook/nolans-project";
 
-  function addMessage(text, sender) {
-    const msg = document.createElement("div");
-    msg.classList.add("message", sender);
-    msg.innerText = text;
-    document.getElementById("messages").appendChild(msg);
-    msg.scrollIntoView();
-  }
+function addMessage(text, sender) {
+  const msg = document.createElement("div");
+  msg.classList.add("message", sender);
+  msg.innerText = text;
+  document.getElementById("messages").appendChild(msg);
+  msg.scrollIntoView({ behavior: "smooth" });
+}
 
-  async function sendMessage() {
+async function sendMessage() {
   const input = document.getElementById("input");
   const text = input.value.trim();
+
   if (!text) return;
 
   addMessage(text, "user");
@@ -130,16 +135,24 @@
       body: JSON.stringify({ message: text })
     });
 
-    const botReply = await response.text();
+    const data = await response.json();
+
+    const botReply = data.reply || "Sem resposta do servidor.";
     addMessage(botReply, "bot");
 
   } catch (error) {
     addMessage(
-      "Estamos corrigindo a rota para Gargântua no momento. Tente novamente em instantes ou contate suporte@usenola.com.",
+      "Erro temporário no sistema. Tente novamente.",
       "bot"
     );
   }
 }
+
+document.getElementById("sendBtn").addEventListener("click", sendMessage);
+
+document.getElementById("input").addEventListener("keydown", (e) => {
+  if (e.key === "Enter") sendMessage();
+});
 </script>
 
 </body>
