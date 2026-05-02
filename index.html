@@ -114,28 +114,29 @@
   }
 
   async function sendMessage() {
-    const input = document.getElementById("input");
-    const text = input.value.trim();
-    if (!text) return;
+  const input = document.getElementById("input");
+  const text = input.value.trim();
+  if (!text) return;
 
-    addMessage(text, "user");
-    input.value = "";
+  addMessage(text, "user");
+  input.value = "";
 
-    try {
-      const response = await fetch(webhookUrl, {
-  method: "POST",
-  headers: {
-    "Content-Type": "application/json"
-  },
-  body: JSON.stringify({ message: text })
-});
-      const botReply = await response.text();
-      addMessage(botReply, "bot");
-    } catch (error) {
-      addMessage("Estamos corrigindo a rota para Gargântua neste ambiente. Enquanto isso, por favor, entre em contato com nosso time através do suporte@usenola.com.", "bot");
-    }
+  try {
+    const response = await fetch(webhookUrl, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ message: text })
+    });
+
+    const botReply = await response.text();
+    addMessage(botReply, "bot");
+
+  } catch (error) {
+    addMessage(
+      "Estamos corrigindo a rota para Gargântua no momento. Tente novamente em instantes ou contate suporte@usenola.com.",
+      "bot"
+    );
   }
-</script>
-
-</body>
-</html>
+}
