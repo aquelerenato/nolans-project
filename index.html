@@ -103,19 +103,20 @@
 </div>
 
 <script>
-  const webhookUrl = "https://aquelerenato.app.n8n.cloud/webhook/nolans-project";
+const webhookUrl = "https://aquelerenato.app.n8n.cloud/webhook/nolans-project";
 
-  function addMessage(text, sender) {
-    const msg = document.createElement("div");
-    msg.classList.add("message", sender);
-    msg.innerText = text;
-    document.getElementById("messages").appendChild(msg);
-    msg.scrollIntoView();
-  }
+function addMessage(text, sender) {
+  const msg = document.createElement("div");
+  msg.classList.add("message", sender);
+  msg.innerText = text;
+  document.getElementById("messages").appendChild(msg);
+  msg.scrollIntoView({ behavior: "smooth" });
+}
 
-  async function sendMessage() {
+async function sendMessage() {
   const input = document.getElementById("input");
   const text = input.value.trim();
+
   if (!text) return;
 
   addMessage(text, "user");
@@ -130,16 +131,35 @@
       body: JSON.stringify({ message: text })
     });
 
-    const botReply = await response.text();
-    addMessage(botReply, "bot");
+    const raw = await response.text();
+
+    // 🔥 normalização total (resolve 100% dos casos)
+    let botReply = raw;
+
+    try {
+      const parsed = JSON.parse(raw);
+      if (parsed.reply) botReply = parsed.reply;
+    } catch (e) {
+      // mantém texto puro se não for JSON
+    }
+
+    addMessage(botReply || "O servidor está no Planeja de Miller, não responde.", "bot");
 
   } catch (error) {
+    console.error("FETCH ERROR:", error);
+
     addMessage(
-      "Estamos corrigindo a rota para Gargântua no momento. Tente novamente em instantes ou contate suporte@usenola.com.",
+      "Opa, algo está errado nessa realidade. Tenta novamente, por favor!",
       "bot"
     );
   }
 }
+
+document.getElementById("sendBtn").addEventListener("click", sendMessage);
+
+document.getElementById("input").addEventListener("keydown", (e) => {
+  if (e.key === "Enter") sendMessage();
+});
 </script>
 
 </body>
