@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Nola Chatbot</title>
+
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -49,6 +50,7 @@
       border-radius: 12px;
       font-size: 14px;
       line-height: 1.4;
+      white-space: pre-wrap;
     }
 
     .user {
@@ -84,15 +86,19 @@
       cursor: pointer;
     }
 
-    .chat-input button:hover {
-      background: #898fff;
+    .chat-input button:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
     }
   </style>
 </head>
+
 <body>
 
 <div class="chat-container">
-  <div class="chat-header">✨ Precisa de ajuda? ✨</br>🌀 O Nolan te explica 🌀</div>
+  <div class="chat-header">
+    ✨ Precisa de ajuda? ✨<br>🌀 O Nolan te explica 🌀
+  </div>
 
   <div class="chat-messages" id="messages"></div>
 
@@ -105,59 +111,55 @@
 <script>
 const webhookUrl = "https://aquelerenato.app.n8n.cloud/webhook/nolans-project";
 
+const input = document.getElementById("input");
+const btn = document.getElementById("sendBtn");
+const messages = document.getElementById("messages");
+
 function addMessage(text, sender) {
   const msg = document.createElement("div");
   msg.classList.add("message", sender);
   msg.innerText = text;
-  document.getElementById("messages").appendChild(msg);
+  messages.appendChild(msg);
   msg.scrollIntoView({ behavior: "smooth" });
 }
 
 async function sendMessage() {
-  const input = document.getElementById("input");
   const text = input.value.trim();
-
   if (!text) return;
 
   addMessage(text, "user");
   input.value = "";
 
+  btn.disabled = true;
+
   try {
-    const response = await fetch(webhookUrl, {
+    const res = await fetch(webhookUrl, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ message: text })
     });
 
-    const raw = await response.text();
+    const raw = await res.text();
 
-    // 🔥 normalização total (resolve 100% dos casos)
-    let botReply = raw;
+    let reply = raw;
 
     try {
-      const parsed = JSON.parse(raw);
-      if (parsed.reply) botReply = parsed.reply;
-    } catch (e) {
-      // mantém texto puro se não for JSON
-    }
+      const json = JSON.parse(raw);
+      if (json.reply) reply = json.reply;
+    } catch (e) {}
 
-    addMessage(botReply || "O servidor está no Planeja de Miller, não responde.", "bot");
+    addMessage(reply || "Sem resposta do servidor.", "bot");
 
-  } catch (error) {
-    console.error("FETCH ERROR:", error);
-
-    addMessage(
-      "Opa, algo está errado nessa realidade. Tenta novamente, por favor!",
-      "bot"
-    );
+  } catch (err) {
+    addMessage("Erro de conexão. Tenta novamente.", "bot");
+  } finally {
+    btn.disabled = false;
   }
 }
 
-document.getElementById("sendBtn").addEventListener("click", sendMessage);
+btn.addEventListener("click", sendMessage);
 
-document.getElementById("input").addEventListener("keydown", (e) => {
+input.addEventListener("keydown", (e) => {
   if (e.key === "Enter") sendMessage();
 });
 </script>
