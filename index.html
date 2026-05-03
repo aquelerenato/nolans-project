@@ -4,7 +4,6 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Nola Chatbot</title>
-
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -90,37 +89,33 @@
     }
   </style>
 </head>
-
 <body>
 
 <div class="chat-container">
-  <div class="chat-header">
-    ✨ Precisa de ajuda? ✨<br>🌀 O Nolan te explica 🌀
-  </div>
+  <div class="chat-header">✨ Precisa de ajuda? ✨</br>🌀 O Nolan te explica 🌀</div>
 
   <div class="chat-messages" id="messages"></div>
 
   <div class="chat-input">
     <input type="text" id="input" placeholder="Digite sua dúvida..." />
-    <button id="sendBtn" type="button">Enviar</button>
+    <button id="sendBtn">Enviar</button>
   </div>
 </div>
 
 <script>
-const webhookUrl = "https://aquelerenato.app.n8n.cloud/webhook/nolans-project";
+  const webhookUrl = "https://aquelerenato.app.n8n.cloud/webhook/nolans-project";
 
-function addMessage(text, sender) {
-  const msg = document.createElement("div");
-  msg.classList.add("message", sender);
-  msg.innerText = text;
-  document.getElementById("messages").appendChild(msg);
-  msg.scrollIntoView({ behavior: "smooth" });
-}
+  function addMessage(text, sender) {
+    const msg = document.createElement("div");
+    msg.classList.add("message", sender);
+    msg.innerText = text;
+    document.getElementById("messages").appendChild(msg);
+    msg.scrollIntoView();
+  }
 
-async function sendMessage() {
+  async function sendMessage() {
   const input = document.getElementById("input");
   const text = input.value.trim();
-
   if (!text) return;
 
   addMessage(text, "user");
@@ -135,24 +130,16 @@ async function sendMessage() {
       body: JSON.stringify({ message: text })
     });
 
-    const data = await response.json();
-
-    const botReply = data.reply || "Sem resposta do servidor.";
+    const botReply = await response.text();
     addMessage(botReply, "bot");
 
   } catch (error) {
     addMessage(
-      "Erro temporário no sistema. Tente novamente.",
+      "Estamos corrigindo a rota para Gargântua no momento. Tente novamente em instantes ou contate suporte@usenola.com.",
       "bot"
     );
   }
 }
-
-document.getElementById("sendBtn").addEventListener("click", sendMessage);
-
-document.getElementById("input").addEventListener("keydown", (e) => {
-  if (e.key === "Enter") sendMessage();
-});
 </script>
 
 </body>
